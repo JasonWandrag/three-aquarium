@@ -1,0 +1,28 @@
+{
+  "name": "ar_debugger",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "cannon-es": "^0.20.0",
+    "dat.gui": "^0.7.9",
+    "pinia": "^2.1.7",
+    "three": "^0.158.0",
+    "tweakpane": "^4.0.1",
+    "vue": "^3.3.8",
+    "yuka": "^0.7.8"
+  },
+  "devDependencies": {
+    "@tweakpane/core": "^2.0.1",
+    "@types/three": "^0.142.0",
+    "@vitejs/plugin-vue": "^4.5.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0",
+    "vue-tsc": "^1.8.22"
+  }
+}
