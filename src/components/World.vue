@@ -15,13 +15,13 @@
        AnimationMixer,
        Clock,
        Box3,
-       Vector3,
+       Vector3 as ThreeVector3, // Rename Vector3 to ThreeVector3
+       Quaternion as ThreeQuaternion, // Add alias for Quaternion
      } from "three";
      import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
      import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
      import * as CANNON from "cannon-es";
      import * as YUKA from "yuka";
-//      import * as dat from "dat.gui";
      import { onMounted, ref } from "vue";
      import { testData } from "../lib/constants";
      import { getRandomNumberBetween } from "../lib/helpers";
@@ -29,22 +29,20 @@
      const sync = (entity: any, renderComponent: any) =>
        renderComponent.matrix.copy(entity.worldMatrix);
      
-     const canvas = ref(null);
+     const canvas = ref(null as any);
      
-//      const gui = new dat.GUI();
      const guiOptions = {
        floorColor: 0xb3bf,
      };
      
-     // Create a renderer
      const renderer = new WebGLRenderer({ antialias: true, alpha: true });
      renderer.setSize(window.innerWidth, window.innerHeight);
      renderer.shadowMap.enabled = true;
-     // Physics Engine
+     
      const world = new CANNON.World({
        gravity: new CANNON.Vec3(0, -9.81, 0),
      });
-     // AI Manager
+     
      const entityManager = new YUKA.EntityManager();
      const scene = new Scene();
      
@@ -82,12 +80,13 @@
                const action = mixer.clipAction(clip);
                action.play();
              });
-             // Add collision phyics to model
-             const boundingBox = new Box3().setFromObject(obj.scene);
      
-             // Get the dimensions of the bounding box
-             const dimensions = new Vector3();
-             boundingBox.getSize(dimensions);
+             const boundingBox = new Box3().setFromObject(obj.scene);
+             const dimensions = new ThreeVector3(
+               boundingBox.max.x - boundingBox.min.x,
+               boundingBox.max.y - boundingBox.min.y,
+               boundingBox.max.z - boundingBox.min.z
+             );
      
              const physicsBody = new CANNON.Body({
                mass: item.canMove ? 1 : 0,
@@ -101,6 +100,7 @@
                ),
              });
              world.addBody(physicsBody);
+     
              model.position.set(
                getRandomNumberBetween(-30, 30),
                item.position.y,
@@ -112,9 +112,6 @@
                item.canMove ? 0 : item.rotation.z
              );
      
-             //  model.rotateX(Math.PI * 0.5);
-     
-             // Add AI
              const vehicle = new YUKA.Vehicle();
              vehicle.setRenderComponent(model, sync);
      
@@ -145,7 +142,7 @@
              const followPathBehaviour = new YUKA.FollowPathBehavior(path, 10);
              vehicle.steering.add(followPathBehaviour);
              entityManager.add(vehicle);
-             const time = new YUKA.Time();
+     
              loadedObjects.push({
                model,
                mixer,
@@ -153,11 +150,12 @@
                physicsBody,
                vehicle,
                path,
-               time,
              });
+     
              if (item.canMove) {
-               model.rotateY(Math.PI); // Rotate around the Y-axis by 180 degrees
+               model.rotateY(Math.PI);
              }
+     
              scene.add(model);
            },
            (xhr) => console.log((xhr.loaded / xhr.total) * 100 + "% loaded"),
@@ -166,13 +164,13 @@
        }
      });
      
-     // Setup Ground
      const floorGeo = new PlaneGeometry(1000, 1000);
      const floorMat = new MeshStandardMaterial({ color: guiOptions.floorColor });
      const floor = new Mesh(floorGeo, floorMat);
      floor.rotation.x = -0.5 * Math.PI;
      floor.receiveShadow = true;
      scene.add(floor);
+     
      const physicsFloor = new CANNON.Body({
        shape: new CANNON.Plane(),
        type: CANNON.Body.STATIC,
@@ -180,7 +178,6 @@
      world.addBody(physicsFloor);
      physicsFloor.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
      
-     // Setup Lighting
      const ambientLight = new AmbientLight(0x333333);
      scene.add(ambientLight);
      const directionalLight = new DirectionalLight(0xffffff, 10);
@@ -192,13 +189,8 @@
      directionalLight.shadow.camera.right = -20;
      scene.add(directionalLight);
      
-//      gui
-//        .addColor(guiOptions, "floorColor")
-//        .onChange((e) => floor.material.color.set(e));
-     
      const timestep = 1 / 60;
      
-     // Animation loop function
      const time = new YUKA.Time();
      function animate() {
        world.step(timestep);
@@ -218,8 +210,11 @@
      renderer.setAnimationLoop(animate);
      
      onMounted(() => {
-       canvas.value.appendChild(renderer.domElement);
+       if (canvas.value) {
+         canvas.value.appendChild(renderer.domElement);
+       }
      });
      </script>
      
      <style></style>
+     
