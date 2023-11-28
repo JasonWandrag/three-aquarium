@@ -15,8 +15,8 @@ import {
   AnimationMixer,
   Clock,
   Box3,
-  Vector3 as ThreeVector3, // Rename Vector3 to ThreeVector3
-  Quaternion as ThreeQuaternion, // Add alias for Quaternion
+  Vector3, // Import Vector3 directly
+  Quaternion, // Import Quaternion directly
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
@@ -82,7 +82,7 @@ testData.forEach((item) => {
         });
 
         const boundingBox = new Box3().setFromObject(obj.scene);
-        const dimensions = new ThreeVector3(
+        const dimensions = new Vector3(
           boundingBox.max.x - boundingBox.min.x,
           boundingBox.max.y - boundingBox.min.y,
           boundingBox.max.z - boundingBox.min.z
