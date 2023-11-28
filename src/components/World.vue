@@ -23,7 +23,7 @@
      import * as YUKA from "yuka";
 //      import * as dat from "dat.gui";
      import { onMounted, ref } from "vue";
-     import { testData, environmentModels } from "../lib/constants";
+     import { testData } from "../lib/constants";
      import { getRandomNumberBetween } from "../lib/helpers";
      
      const sync = (entity: any, renderComponent: any) =>
